@@ -1,0 +1,6 @@
+"delay.obj",
+"main.obj",
+"led.obj",
+"dht.obj" 
+TO "SCM-DHT11WithLED" 
+RAMSIZE(256) 

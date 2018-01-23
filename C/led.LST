@@ -1,0 +1,82 @@
+C51 COMPILER V8.06   LED                                                                   01/23/2018 15:21:24 PAGE 1   
+
+
+C51 COMPILER V8.06, COMPILATION OF MODULE LED
+OBJECT MODULE PLACED IN led.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE led.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "head.h"
+   2          
+   3          uchar ledD[]={0,0,0,0,0,0,0,0}; //湿度4位+温度4位，由高到低
+   4          uchar ledC[]={0x10,0x20,0x40,0x80,0x01,0x02,0x04,0x08}; //段选，对应ledD各位数字
+   5          
+   6          void getLedCode()
+   7          {
+   8   1              uchar i;
+   9   1              uint tmp100 = dhtData[2]*100 + dhtData[3];
+  10   1              uint hum100 = dhtData[0]*100 + dhtData[1];
+  11   1              uchar ledCode[]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
+  12   1              for(i=0;i<4;i++)
+  13   1              {       
+  14   2                      ledD[3-i]=ledCode[hum100%10];
+  15   2                      ledD[7-i]=ledCode[tmp100%10];
+  16   2                      hum100/=10;
+  17   2                      tmp100/=10;
+  18   2              }       
+  19   1              ledD[1]|=0x80;
+  20   1              ledD[5]|=0x80;
+  21   1      }
+  22          
+  23          void sendTo595(uchar c)//把温度或湿度的某一位值、对应序列号放入2个595中
+  24          {
+  25   1              uchar i,dat;
+  26   1              dat=ledC[c];
+  27   1              for(i=0;i<8;i++)
+  28   1              {
+  29   2                      CLK=0;
+  30   2                      LED=dat&0x80;
+  31   2                      dat=dat<<1;
+  32   2                      CLK=1;
+  33   2              }
+  34   1              dat=ledD[c];
+  35   1              for(i=0;i<8;i++)
+  36   1              {
+  37   2                      CLK=0;
+  38   2                      LED=dat&0x80;
+  39   2                      dat=dat<<1;
+  40   2                      CLK=1;
+  41   2              }
+  42   1              sCLK=0;
+  43   1              nop();
+  44   1              nop();
+  45   1              sCLK=1;
+  46   1      }
+  47          
+  48          
+  49          void ledShow()
+  50          {
+  51   1              uchar i;
+  52   1              getLedCode();
+  53   1              for(i=0;i<8;i++)
+  54   1              {
+  55   2                      sendTo595(i);
+C51 COMPILER V8.06   LED                                                                   01/23/2018 15:21:24 PAGE 2   
+
+  56   2              }
+  57   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    218    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     16      14
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

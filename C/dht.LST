@@ -1,0 +1,70 @@
+C51 COMPILER V8.06   DHT                                                                   01/23/2018 15:21:24 PAGE 1   
+
+
+C51 COMPILER V8.06, COMPILATION OF MODULE DHT
+OBJECT MODULE PLACED IN dht.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE dht.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "head.h"
+   2          
+   3          uchar tempData[5]={0,0,0,0,0};
+   4          
+   5          uchar dhtReadByte()
+   6          {
+   7   1              uchar i=0,dat=0;
+   8   1              for(i=0;i<8;i++)
+   9   1              {
+  10   2                      while(!DQ);
+  11   2                      Delay40us();
+  12   2                      dat<<=1;
+  13   2                      if(DQ)
+  14   2                      {
+  15   3                              dat++;
+  16   3                              while(DQ);
+  17   3                      }               
+  18   2              }
+  19   1              return dat;
+  20   1      }
+  21          
+  22          
+  23          void dhtGetdat()
+  24          {
+  25   1              uchar  i;
+  26   1              Delay40us();
+  27   1              if(!DQ)
+  28   1              {
+  29   2                      while(!DQ);
+  30   2                      Delay40us();
+  31   2                      Delay40us();
+  32   2                      Delay10us();
+  33   2                      tempData[0]=    dhtReadByte();
+  34   2                      tempData[1]=    dhtReadByte();
+  35   2                      tempData[2]=    dhtReadByte();
+  36   2                      tempData[3]=    dhtReadByte();
+  37   2                      tempData[4]=    dhtReadByte();
+  38   2              }
+  39   1              DQ=1;
+  40   1              if(tempData[4] == tempData[0]+tempData[1]+tempData[2]+tempData[3])
+  41   1              {
+  42   2                      for(i=0;i<5;i++)
+  43   2                              dhtData[i]=tempData[i];
+  44   2              }
+  45   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    135    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      5       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+C51 COMPILER V8.06   DHT                                                                   01/23/2018 15:21:24 PAGE 2   
+
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

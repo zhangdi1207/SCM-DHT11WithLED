@@ -1,0 +1,65 @@
+C51 COMPILER V8.06   MAIN                                                                  01/23/2018 15:21:24 PAGE 1   
+
+
+C51 COMPILER V8.06, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "head.h"
+   2          
+   3          uchar dhtData[]={0,0,0,0,1};
+   4          
+   5          void Timer0Init(void)           //20毫秒@11.0592MHz
+   6          {
+   7   1              AUXR &= 0x7F;           //定时器时钟12T模式
+   8   1              TMOD &= 0xF0;           //设置定时器模式
+   9   1              TL0 = 0x00;             //设置定时初值
+  10   1              TH0 = 0xB8;             //设置定时初值
+  11   1              TF0 = 0;                //清除TF0标志
+  12   1              EA=1;                   //中断允许
+  13   1              ET0=1;
+  14   1              TR0 = 1;                //定时器0开始计时
+  15   1      }
+  16          
+  17          void tm0Isr() interrupt 1 using 1
+  18          {
+  19   1              DQ = 1;
+  20   1              dhtGetdat();     //开始读数
+  21   1      }
+  22          
+  23          void main()
+  24          {
+  25   1              int i;
+  26   1              WDT_CONTR = WDT;
+  27   1              LED=0;
+  28   1              DQ = 1;
+  29   1      
+  30   1              Delay1s(); //DHT11越过不稳定阶段
+  31   1              while(1)
+  32   1              {       
+  33   2                      DQ=0;                   //DHT11低电平延时18ms
+  34   2                      Timer0Init();
+  35   2                      for(i=0;i<500;i++)
+  36   2                      {
+  37   3                              WDT_CONTR = WDT;//喂狗
+  38   3                              ledShow();
+  39   3                      }
+  40   2              }
+  41   1      }
+  42          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     97    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      5       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
